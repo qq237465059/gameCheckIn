@@ -4,20 +4,27 @@ const request = require('./utils/request');
 
 App({
   onLaunch: function() {
-    // 初始化调试工具
-    debugUtil.injectTraceGlobally();
-    debugUtil.initErrorHandler();
-    
-    // 开发模式下，覆盖微信API以解决文件操作权限问题
-    if (request.isDevMode()) {
-      debugUtil.overrideWxAPIs();
+    try {
+      // 初始化应用全局数据
+      this.initGlobalData();
       
-      // 为全局添加一个模拟的文件系统管理器，防止直接使用 wx.getFileSystemManager() 的情况
-      this.mockFSM = this.createMockFileSystemManager();
+      // 初始化调试工具
+      debugUtil.injectTraceGlobally();
+      debugUtil.initErrorHandler();
+      
+      // 开发模式下，覆盖微信API以解决文件操作权限问题
+      if (request.isDevMode()) {
+        debugUtil.overrideWxAPIs();
+        
+        // 为全局添加一个模拟的文件系统管理器，防止直接使用 wx.getFileSystemManager() 的情况
+        this.mockFSM = this.createMockFileSystemManager();
+      }
+      
+      // 初始化应用时执行
+      this.checkLogin();
+    } catch (error) {
+      console.error('应用初始化失败:', error);
     }
-    
-    // 初始化应用时执行
-    this.checkLogin();
   },
   
   onShow: function() {
@@ -28,54 +35,57 @@ App({
     // 小程序进入后台时触发
   },
   
-  globalData: {
-    userInfo: null,
-    isLoggedIn: false,
-    activities: [],
-    checkIns: [],
-    // 模拟数据
-    mockData: {
-      // 用户签到记录
-      checkInRecords: [
-        {
-          id: 'checkin_001',
-          activityId: 'activity_001',
-          activityName: '周末篮球友谊赛',
-          checkInTime: '2023-08-15 13:45:30',
-          location: '市体育中心篮球馆',
-          distanceDesc: '0米',
-          photoUrl: '/assets/images/basketball.jpg',
-          status: 'success'
-        },
-        {
-          id: 'checkin_002',
-          activityId: 'activity_002',
-          activityName: '城市定向赛',
-          checkInTime: '2023-08-10 09:10:22',
-          location: '中央公园入口',
-          distanceDesc: '5米',
-          photoUrl: '/assets/images/park.jpg',
-          status: 'success'
-        },
-        {
-          id: 'checkin_003',
-          activityId: 'activity_003',
-          activityName: '瑜伽交流会',
-          checkInTime: '2023-08-05 18:30:15',
-          location: '健身中心',
-          distanceDesc: '2米',
-          photoUrl: '/assets/images/yoga.jpg',
-          status: 'success'
+  // 初始化全局数据
+  initGlobalData: function() {
+    this.globalData = {
+      userInfo: null,
+      isLoggedIn: false,
+      activities: [],
+      checkIns: [],
+      // 模拟数据
+      mockData: {
+        // 用户签到记录
+        checkInRecords: [
+          {
+            id: 'checkin_001',
+            activityId: 'activity_001',
+            activityName: '周末篮球友谊赛',
+            checkInTime: '2023-08-15 13:45:30',
+            location: '市体育中心篮球馆',
+            distanceDesc: '0米',
+            photoUrl: '/assets/images/basketball.jpg',
+            status: 'success'
+          },
+          {
+            id: 'checkin_002',
+            activityId: 'activity_002',
+            activityName: '城市定向赛',
+            checkInTime: '2023-08-10 09:10:22',
+            location: '中央公园入口',
+            distanceDesc: '5米',
+            photoUrl: '/assets/images/park.jpg',
+            status: 'success'
+          },
+          {
+            id: 'checkin_003',
+            activityId: 'activity_003',
+            activityName: '瑜伽交流会',
+            checkInTime: '2023-08-05 18:30:15',
+            location: '健身中心',
+            distanceDesc: '2米',
+            photoUrl: '/assets/images/yoga.jpg',
+            status: 'success'
+          }
+        ],
+        // 用户统计数据
+        userStatistics: {
+          totalCheckins: 15,
+          createdActivities: 3,
+          joinedActivities: 12,
+          completedActivities: 10
         }
-      ],
-      // 用户统计数据
-      userStatistics: {
-        totalCheckins: 15,
-        createdActivities: 3,
-        joinedActivities: 12,
-        completedActivities: 10
       }
-    }
+    };
   },
   
   checkLogin: function() {
@@ -95,22 +105,33 @@ App({
       return;
     }
     
-    // 检查用户是否已登录
-    const token = wx.getStorageSync('token');
-    if (token) {
-      this.globalData.isLoggedIn = true;
-      // 获取用户信息
-      this.getUserInfo();
-    } else {
-      this.globalData.isLoggedIn = false;
-      // 如果未登录，跳转到登录页面（除个人中心外）
-      const pages = getCurrentPages();
-      const currentPage = pages[pages.length - 1];
-      if (currentPage && currentPage.route !== 'pages/profile/profile') {
-        wx.redirectTo({
-          url: '/pages/login/login'
-        });
+    try {
+      // 检查用户是否已登录
+      const token = wx.getStorageSync('token');
+      if (token) {
+        this.globalData.isLoggedIn = true;
+        // 获取用户信息
+        this.getUserInfo();
+      } else {
+        this.globalData.isLoggedIn = false;
+        // 如果未登录，跳转到登录页面（除个人中心外）
+        const pages = getCurrentPages();
+        const currentPage = pages[pages.length - 1];
+        if (currentPage && currentPage.route !== 'pages/profile/profile') {
+          wx.redirectTo({
+            url: '/pages/login/login'
+          });
+        }
       }
+    } catch (error) {
+      console.error('检查登录状态失败:', error);
+      // 失败时默认为开发模式
+      this.globalData.isLoggedIn = true;
+      this.globalData.userInfo = {
+        userId: 'dev_user_error',
+        nickName: '开发者(错误恢复)',
+        avatarUrl: '/assets/images/default-avatar.png'
+      };
     }
   },
   
@@ -128,29 +149,33 @@ App({
       return;
     }
     
-    // 获取用户信息的方法
-    wx.request({
-      url: 'https://your-api.com/user/info',
-      header: {
-        'Authorization': 'Bearer ' + wx.getStorageSync('token')
-      },
-      success: (res) => {
-        if (res.data && res.data.code === 0) {
-          this.globalData.userInfo = res.data.data;
-        } else {
-          // 获取用户信息失败，可能是token过期
-          wx.removeStorageSync('token');
-          this.globalData.isLoggedIn = false;
+    try {
+      // 获取用户信息的方法
+      wx.request({
+        url: 'https://your-api.com/user/info',
+        header: {
+          'Authorization': 'Bearer ' + wx.getStorageSync('token')
+        },
+        success: (res) => {
+          if (res.data && res.data.code === 0) {
+            this.globalData.userInfo = res.data.data;
+          } else {
+            // 获取用户信息失败，可能是token过期
+            wx.removeStorageSync('token');
+            this.globalData.isLoggedIn = false;
+          }
+        },
+        fail: () => {
+          // 请求失败，可能是网络问题
+          wx.showToast({
+            title: '网络错误，请重试',
+            icon: 'none'
+          });
         }
-      },
-      fail: () => {
-        // 请求失败，可能是网络问题
-        wx.showToast({
-          title: '网络错误，请重试',
-          icon: 'none'
-        });
-      }
-    });
+      });
+    } catch (error) {
+      console.error('获取用户信息失败:', error);
+    }
   },
   
   // 创建模拟的文件系统管理器
