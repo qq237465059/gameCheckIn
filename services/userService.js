@@ -1,6 +1,18 @@
 // 用户服务
 const request = require('../utils/request');
-const app = getApp();
+
+// 获取app实例的安全方法
+const getAppInstance = () => {
+  try {
+    if (typeof getApp === 'function') {
+      return getApp();
+    }
+    return null;
+  } catch (error) {
+    console.warn('获取应用实例失败:', error);
+    return null;
+  }
+};
 
 // 用户相关API
 const userAPI = {
@@ -87,7 +99,10 @@ const mockUserService = {
         };
         
         // 保存用户信息和token
-        app.globalData.userInfo = mockUser;
+        const app = getAppInstance();
+        if (app && app.globalData) {
+          app.globalData.userInfo = mockUser;
+        }
         wx.setStorageSync('token', mockUser.token);
         
         resolve(mockUser);
@@ -127,8 +142,9 @@ const mockUserService = {
     return new Promise((resolve) => {
       console.log('模拟获取用户信息');
       setTimeout(() => {
+        const app = getAppInstance();
         // 如果已登录，返回本地用户信息
-        if (app.globalData.userInfo) {
+        if (app && app.globalData && app.globalData.userInfo) {
           resolve(app.globalData.userInfo);
           return;
         }
@@ -154,8 +170,19 @@ const mockUserService = {
       console.log('模拟更新用户信息，数据:', data);
       setTimeout(() => {
         // 更新本地用户信息
-        const userInfo = { ...app.globalData.userInfo, ...data };
-        app.globalData.userInfo = userInfo;
+        const app = getAppInstance();
+        let userInfo = { 
+          userId: 'user_123456',
+          nickName: '测试用户',
+          avatarUrl: '/assets/images/default-avatar.png'
+        };
+        
+        if (app && app.globalData && app.globalData.userInfo) {
+          userInfo = { ...app.globalData.userInfo, ...data };
+          app.globalData.userInfo = userInfo;
+        } else {
+          userInfo = { ...userInfo, ...data };
+        }
         
         resolve(userInfo);
       }, 800);
@@ -180,8 +207,9 @@ const mockUserService = {
     return new Promise((resolve) => {
       console.log('模拟获取用户统计信息');
       setTimeout(() => {
+        const app = getAppInstance();
         // 检查是否有全局模拟数据
-        if (app.globalData && app.globalData.mockData && app.globalData.mockData.userStatistics) {
+        if (app && app.globalData && app.globalData.mockData && app.globalData.mockData.userStatistics) {
           resolve(app.globalData.mockData.userStatistics);
           return;
         }
@@ -220,7 +248,10 @@ const mockUserService = {
         };
         
         // 保存用户信息和token
-        app.globalData.userInfo = mockUser;
+        const app = getAppInstance();
+        if (app && app.globalData) {
+          app.globalData.userInfo = mockUser;
+        }
         wx.setStorageSync('token', mockUser.token);
         
         resolve(mockUser);
@@ -233,8 +264,9 @@ const mockUserService = {
 // 开发模式下始终使用模拟服务
 const isDevMode = () => {
   try {
-    return require('./request').isDevMode();
+    return request.isDevMode();
   } catch (e) {
+    console.warn('获取开发模式状态失败，默认使用开发模式', e);
     return true; // 如果出错，默认为开发模式
   }
 };

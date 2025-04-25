@@ -47,19 +47,37 @@ const debugUtil = {
   
   /**
    * 注入Trace对象到全局作用域 (谨慎使用)
+   * 安全版本，避免在应用初始化前调用getApp()
    */
   injectTraceGlobally: function() {
-    if (typeof getApp !== 'undefined') {
-      const app = getApp();
-      app.Trace = Trace;
-    }
-    
-    // 注意：这里使用了全局变量，可能导致命名冲突
-    // 只在开发和调试阶段使用
-    if (typeof global !== 'undefined') {
-      global.Trace = Trace;
-    } else if (typeof wx !== 'undefined') {
-      wx.Trace = Trace;
+    try {
+      // 不要立即调用getApp()，而是在全局的wx对象上附加Trace对象
+      if (typeof wx !== 'undefined') {
+        wx.Trace = Trace;
+        console.log('Trace对象已附加到wx全局对象');
+      }
+      
+      // 延迟设置app.Trace，确保app已经初始化
+      setTimeout(() => {
+        try {
+          if (typeof getApp === 'function') {
+            const app = getApp();
+            if (app) {
+              app.Trace = Trace;
+              console.log('Trace对象已附加到app全局对象');
+            }
+          }
+        } catch (e) {
+          console.warn('无法将Trace对象附加到app', e);
+        }
+      }, 100);
+      
+      // 兼容其他环境
+      if (typeof global !== 'undefined') {
+        global.Trace = Trace;
+      }
+    } catch (error) {
+      console.warn('注入Trace对象失败:', error);
     }
   },
   
@@ -67,158 +85,180 @@ const debugUtil = {
    * 初始化全局错误拦截器
    */
   initErrorHandler: function() {
-    // 监听全局错误
-    wx.onError(function(error) {
-      Trace.error('全局错误捕获', error);
-    });
-    
-    // 监听页面未找到错误
-    wx.onPageNotFound(function(res) {
-      Trace.error('页面未找到', res);
-    });
-    
-    // 监听内存警告
-    wx.onMemoryWarning(function() {
-      Trace.warn('内存不足警告');
-    });
+    try {
+      // 监听全局错误
+      wx.onError(function(error) {
+        Trace.error('全局错误捕获', error);
+      });
+      
+      // 监听页面未找到错误
+      wx.onPageNotFound(function(res) {
+        Trace.error('页面未找到', res);
+      });
+      
+      // 监听内存警告
+      wx.onMemoryWarning(function() {
+        Trace.warn('内存不足警告');
+      });
+    } catch (error) {
+      console.warn('初始化错误处理器失败:', error);
+    }
   },
 
   /**
    * 覆盖微信API以解决开发模式下的权限问题
    */
   overrideWxAPIs: function() {
-    // 备份原始方法
-    const originalWx = {};
-    
-    // 需要覆盖的文件相关API
-    const fileAPIs = [
-      'saveFile', 'getFileInfo', 'getSavedFileList', 'getSavedFileInfo',
-      'removeSavedFile', 'openDocument', 'getFileSystemManager',
-      'writeFile', 'readFile', 'writeFileSync', 'readFileSync',
-      'accessSync', 'access', 'appendFile', 'appendFileSync'
-    ];
-    
-    // 备份原始方法并覆盖
-    fileAPIs.forEach(api => {
-      if (wx[api]) {
-        originalWx[api] = wx[api];
-        wx[api] = function(options) {
-          console.log(`Mock ${api} called with:`, options);
-          
-          // 模拟成功回调
-          if (options && options.success) {
-            setTimeout(() => {
-              const mockResult = debugUtil.getMockResultForAPI(api, options);
-              options.success(mockResult);
-            }, 100);
+    try {
+      // 备份原始方法
+      const originalWx = {};
+      
+      // 需要覆盖的文件相关API
+      const fileAPIs = [
+        'saveFile', 'getFileInfo', 'getSavedFileList', 'getSavedFileInfo',
+        'removeSavedFile', 'openDocument', 'getFileSystemManager',
+        'writeFile', 'readFile', 'writeFileSync', 'readFileSync',
+        'accessSync', 'access', 'appendFile', 'appendFileSync'
+      ];
+      
+      // 备份原始方法并覆盖
+      fileAPIs.forEach(api => {
+        if (wx[api]) {
+          originalWx[api] = wx[api];
+          wx[api] = function(options) {
+            console.log(`Mock ${api} called with:`, options);
+            
+            // 模拟成功回调
+            if (options && options.success) {
+              setTimeout(() => {
+                const mockResult = debugUtil.getMockResultForAPI(api, options);
+                options.success(mockResult);
+              }, 100);
+            }
+            
+            // 如果有complete回调也执行
+            if (options && options.complete) {
+              setTimeout(() => {
+                options.complete({ errMsg: `${api}:ok` });
+              }, 150);
+            }
+            
+            // 如果是同步API，返回模拟结果
+            if (api.endsWith('Sync')) {
+              return debugUtil.getMockResultForAPI(api, options);
+            }
+          };
+        }
+      });
+      
+      // 覆盖上传文件API
+      if (wx.uploadFile) {
+        originalWx.uploadFile = wx.uploadFile;
+        wx.uploadFile = function(options) {
+          // 检查是否在开发模式
+          let isDevMode = true;
+          try {
+            const request = require('./request');
+            isDevMode = request.isDevMode();
+          } catch (e) {
+            console.warn('无法加载request模块，默认使用开发模式', e);
           }
           
-          // 如果有complete回调也执行
-          if (options && options.complete) {
+          if (isDevMode) {
+            console.log(`Mock uploadFile called with:`, options);
+            
+            // 模拟上传成功
             setTimeout(() => {
-              options.complete({ errMsg: `${api}:ok` });
-            }, 150);
-          }
-          
-          // 如果是同步API，返回模拟结果
-          if (api.endsWith('Sync')) {
-            return debugUtil.getMockResultForAPI(api, options);
+              if (options.success) {
+                options.success({
+                  statusCode: 200,
+                  data: JSON.stringify({
+                    code: 0,
+                    message: 'success',
+                    data: {
+                      url: options.filePath,
+                      fileId: 'mock_file_' + Date.now()
+                    }
+                  }),
+                  errMsg: 'uploadFile:ok'
+                });
+              }
+              
+              if (options.complete) {
+                options.complete({
+                  errMsg: 'uploadFile:ok'
+                });
+              }
+            }, 500);
+            
+            // 返回一个模拟的上传任务
+            return {
+              abort: () => console.log('Upload aborted'),
+              onProgressUpdate: (callback) => {
+                setTimeout(() => callback({ progress: 100 }), 400);
+              },
+              offProgressUpdate: () => {}
+            };
+          } else {
+            // 非开发模式，使用原始方法
+            return originalWx.uploadFile(options);
           }
         };
       }
-    });
-    
-    // 覆盖上传文件API
-    if (wx.uploadFile) {
-      originalWx.uploadFile = wx.uploadFile;
-      wx.uploadFile = function(options) {
-        // 检查是否在开发模式
-        const request = require('./request');
-        if (request.isDevMode()) {
-          console.log(`Mock uploadFile called with:`, options);
+      
+      // 覆盖下载文件API
+      if (wx.downloadFile) {
+        originalWx.downloadFile = wx.downloadFile;
+        wx.downloadFile = function(options) {
+          // 检查是否在开发模式
+          let isDevMode = true;
+          try {
+            const request = require('./request');
+            isDevMode = request.isDevMode();
+          } catch (e) {
+            console.warn('无法加载request模块，默认使用开发模式', e);
+          }
           
-          // 模拟上传成功
-          setTimeout(() => {
-            if (options.success) {
-              options.success({
-                statusCode: 200,
-                data: JSON.stringify({
-                  code: 0,
-                  message: 'success',
-                  data: {
-                    url: options.filePath,
-                    fileId: 'mock_file_' + Date.now()
-                  }
-                }),
-                errMsg: 'uploadFile:ok'
-              });
-            }
+          if (isDevMode) {
+            console.log(`Mock downloadFile called with:`, options);
             
-            if (options.complete) {
-              options.complete({
-                errMsg: 'uploadFile:ok'
-              });
-            }
-          }, 500);
-          
-          // 返回一个模拟的上传任务
-          return {
-            abort: () => console.log('Upload aborted'),
-            onProgressUpdate: (callback) => {
-              setTimeout(() => callback({ progress: 100 }), 400);
-            },
-            offProgressUpdate: () => {}
-          };
-        } else {
-          // 非开发模式，使用原始方法
-          return originalWx.uploadFile(options);
-        }
-      };
-    }
-    
-    // 覆盖下载文件API
-    if (wx.downloadFile) {
-      originalWx.downloadFile = wx.downloadFile;
-      wx.downloadFile = function(options) {
-        // 检查是否在开发模式
-        const request = require('./request');
-        if (request.isDevMode()) {
-          console.log(`Mock downloadFile called with:`, options);
-          
-          // 模拟下载成功
-          setTimeout(() => {
-            if (options.success) {
-              options.success({
-                statusCode: 200,
-                tempFilePath: '/mock_temp_path/file_' + Date.now(),
-                filePath: '/mock_path/file_' + Date.now(),
-                errMsg: 'downloadFile:ok'
-              });
-            }
+            // 模拟下载成功
+            setTimeout(() => {
+              if (options.success) {
+                options.success({
+                  statusCode: 200,
+                  tempFilePath: '/mock_temp_path/file_' + Date.now(),
+                  filePath: '/mock_path/file_' + Date.now(),
+                  errMsg: 'downloadFile:ok'
+                });
+              }
+              
+              if (options.complete) {
+                options.complete({
+                  errMsg: 'downloadFile:ok'
+                });
+              }
+            }, 500);
             
-            if (options.complete) {
-              options.complete({
-                errMsg: 'downloadFile:ok'
-              });
-            }
-          }, 500);
-          
-          // 返回一个模拟的下载任务
-          return {
-            abort: () => console.log('Download aborted'),
-            onProgressUpdate: (callback) => {
-              setTimeout(() => callback({ progress: 100 }), 400);
-            },
-            offProgressUpdate: () => {}
-          };
-        } else {
-          // 非开发模式，使用原始方法
-          return originalWx.downloadFile(options);
-        }
-      };
+            // 返回一个模拟的下载任务
+            return {
+              abort: () => console.log('Download aborted'),
+              onProgressUpdate: (callback) => {
+                setTimeout(() => callback({ progress: 100 }), 400);
+              },
+              offProgressUpdate: () => {}
+            };
+          } else {
+            // 非开发模式，使用原始方法
+            return originalWx.downloadFile(options);
+          }
+        };
+      }
+      
+      console.log('微信文件API已被覆盖，文件操作将在开发模式下模拟执行');
+    } catch (error) {
+      console.warn('覆盖微信API失败:', error);
     }
-    
-    console.log('微信文件API已被覆盖，文件操作将在开发模式下模拟执行');
   },
 
   /**

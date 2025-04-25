@@ -5,6 +5,27 @@ const checkInService = require('../../services/checkInService');
 const dateUtil = require('../../utils/dateUtil');
 const locationUtil = require('../../utils/locationUtil');
 
+// 安全获取Trace对象的函数
+const getTrace = function() {
+  // 优先从wx全局对象获取
+  if (typeof wx !== 'undefined' && wx.Trace) {
+    return wx.Trace;
+  }
+  
+  // 其次从app对象获取
+  if (app && app.Trace) {
+    return app.Trace;
+  }
+  
+  // 都不存在则返回一个空对象，避免调用时报错
+  return {
+    log: function(msg) { console.log(msg); },
+    error: function(msg, err) { console.error(msg, err); },
+    warn: function(msg) { console.warn(msg); },
+    info: function(msg) { console.info(msg); }
+  };
+};
+
 Page({
   /**
    * 页面的初始数据
@@ -21,7 +42,9 @@ Page({
     isInRange: false,
     faceVerified: false,
     photoUrl: "",
-    canCheckIn: false
+    canCheckIn: false,
+    errorMessage: "",
+    showError: false
   },
 
   /**
@@ -34,10 +57,7 @@ Page({
       });
       this.loadActivityDetail();
     } else {
-      wx.showToast({
-        title: '活动ID不存在',
-        icon: 'none'
-      });
+      this.showError('活动ID不存在');
       setTimeout(() => {
         wx.navigateBack();
       }, 1500);
@@ -50,6 +70,34 @@ Page({
   onShow: function () {
     // 获取位置信息
     this.refreshLocation();
+  },
+
+  /**
+   * 处理错误
+   */
+  handleError: function(error, message) {
+    console.error(message, error);
+    
+    // 安全获取Trace对象并记录错误
+    const trace = getTrace();
+    trace.error(message, error);
+    
+    this.showError(message);
+  },
+
+  /**
+   * 显示错误信息
+   */
+  showError: function(message) {
+    this.setData({
+      errorMessage: message,
+      showError: true
+    });
+    
+    wx.showToast({
+      title: message,
+      icon: 'none'
+    });
   },
 
   /**
@@ -78,15 +126,10 @@ Page({
         }
       })
       .catch(error => {
-        console.error('获取活动详情失败:', error);
+        this.handleError(error, '获取活动详情失败');
         this.setData({ 
           loading: false,
           activity: null
-        });
-        
-        wx.showToast({
-          title: '获取活动详情失败',
-          icon: 'none'
         });
       });
   },
@@ -110,7 +153,7 @@ Page({
         }
       })
       .catch(error => {
-        console.error('获取签到状态失败:', error);
+        this.handleError(error, '获取签到状态失败');
         this.setData({
           checkInStatus: false
         });
@@ -133,35 +176,51 @@ Page({
           longitude: res.longitude
         };
         
-        // 获取位置名称
-        wx.chooseLocation({
-          latitude: location.latitude,
-          longitude: location.longitude,
-          complete: (result) => {
-            if (result.errMsg === 'chooseLocation:ok') {
-              location.name = result.name || result.address;
-              location.address = result.address;
-            }
-            
-            this.setData({
-              userLocation: location
-            });
-            
-            if (this.data.activity) {
-              this.checkLocation();
-            }
-            
-            wx.hideLoading();
-          }
+        // 直接使用获取到的位置，不需要调用chooseLocation
+        location.name = '当前位置';
+        
+        this.setData({
+          userLocation: location
         });
+        
+        if (this.data.activity) {
+          this.checkLocation();
+        }
+        
+        wx.hideLoading();
       },
       fail: (error) => {
-        console.error('获取位置失败:', error);
+        this.handleError(error, '获取位置失败，请检查定位权限');
         wx.hideLoading();
-        wx.showToast({
-          title: '获取位置失败，请检查定位权限',
-          icon: 'none'
-        });
+      }
+    });
+  },
+
+  /**
+   * 手动选择位置
+   */
+  chooseLocation: function() {
+    wx.chooseLocation({
+      success: (res) => {
+        if (res.name || res.address) {
+          const location = {
+            latitude: res.latitude,
+            longitude: res.longitude,
+            name: res.name || res.address,
+            address: res.address
+          };
+          
+          this.setData({
+            userLocation: location
+          });
+          
+          if (this.data.activity) {
+            this.checkLocation();
+          }
+        }
+      },
+      fail: (error) => {
+        this.handleError(error, '选择位置失败');
       }
     });
   },
@@ -199,12 +258,12 @@ Page({
     let canCheckIn = this.data.isInRange;
     
     // 如果需要人脸识别，检查是否已完成
-    if (this.data.activity.needFace) {
+    if (this.data.activity && this.data.activity.needFace) {
       canCheckIn = canCheckIn && this.data.faceVerified;
     }
     
     // 如果需要照片，检查是否已上传
-    if (this.data.activity.needPhoto) {
+    if (this.data.activity && this.data.activity.needPhoto) {
       canCheckIn = canCheckIn && !!this.data.photoUrl;
     }
     
@@ -225,10 +284,7 @@ Page({
         scale: 18
       });
     } else {
-      wx.showToast({
-        title: '未设置活动地点',
-        icon: 'none'
-      });
+      this.showError('未设置活动地点');
     }
   },
 
@@ -241,20 +297,36 @@ Page({
     });
     
     // 调用人脸识别 API
-    setTimeout(() => {
-      wx.hideLoading();
-      // 模拟人脸识别成功
-      this.setData({
-        faceVerified: true
+    // 实际项目中应该调用真实的人脸识别SDK或API
+    const activityId = this.data.activityId;
+    const faceData = {
+      timestamp: Date.now(),
+      userId: app.globalData.userInfo ? app.globalData.userInfo.userId : ''
+    };
+    
+    checkInService.uploadFaceData(activityId, faceData)
+      .then(result => {
+        wx.hideLoading();
+        
+        if (result.faceVerified) {
+          this.setData({
+            faceVerified: true
+          });
+          
+          this.updateCheckInStatus();
+          
+          wx.showToast({
+            title: '人脸识别成功',
+            icon: 'success'
+          });
+        } else {
+          this.showError('人脸识别失败，请重试');
+        }
+      })
+      .catch(error => {
+        wx.hideLoading();
+        this.handleError(error, '人脸识别失败');
       });
-      
-      this.updateCheckInStatus();
-      
-      wx.showToast({
-        title: '人脸识别成功',
-        icon: 'success'
-      });
-    }, 1500);
   },
 
   /**
@@ -267,11 +339,31 @@ Page({
       sourceType: ['camera', 'album'],
       success: (res) => {
         const tempFilePath = res.tempFilePaths[0];
-        this.setData({
-          photoUrl: tempFilePath
+        
+        wx.showLoading({
+          title: '上传照片中...',
         });
         
-        this.updateCheckInStatus();
+        // 上传照片
+        checkInService.uploadCheckInPhoto(this.data.activityId, tempFilePath)
+          .then(result => {
+            wx.hideLoading();
+            
+            this.setData({
+              photoUrl: result.photoUrl || tempFilePath
+            });
+            
+            this.updateCheckInStatus();
+            
+            wx.showToast({
+              title: '照片上传成功',
+              icon: 'success'
+            });
+          })
+          .catch(error => {
+            wx.hideLoading();
+            this.handleError(error, '照片上传失败');
+          });
       }
     });
   },
@@ -297,6 +389,11 @@ Page({
     });
     
     this.updateCheckInStatus();
+    
+    wx.showToast({
+      title: '已删除照片',
+      icon: 'success'
+    });
   },
 
   /**
@@ -304,10 +401,17 @@ Page({
    */
   submitCheckIn: function () {
     if (!this.data.canCheckIn) {
-      wx.showToast({
-        title: '请完成所有签到要求',
-        icon: 'none'
-      });
+      let message = '请完成所有签到要求';
+      
+      if (!this.data.isInRange) {
+        message = '您不在签到范围内';
+      } else if (this.data.activity.needFace && !this.data.faceVerified) {
+        message = '请先完成人脸识别';
+      } else if (this.data.activity.needPhoto && !this.data.photoUrl) {
+        message = '请先上传签到照片';
+      }
+      
+      this.showError(message);
       return;
     }
     
@@ -323,7 +427,7 @@ Page({
       faceVerified: this.data.faceVerified
     };
     
-    checkInService.submitCheckIn(checkInData)
+    checkInService.submitCheckIn(this.data.activityId, checkInData)
       .then(result => {
         wx.hideLoading();
         wx.showToast({
@@ -337,16 +441,14 @@ Page({
           checkInTime: dateUtil.formatDateTime(new Date())
         });
         
-        // 刷新数据
-        this.loadCheckInStatus();
+        // 延迟返回
+        setTimeout(() => {
+          wx.navigateBack();
+        }, 1500);
       })
       .catch(error => {
-        console.error('签到失败:', error);
         wx.hideLoading();
-        wx.showToast({
-          title: error.message || '签到失败，请重试',
-          icon: 'none'
-        });
+        this.handleError(error, '签到失败，请重试');
       });
   },
 
