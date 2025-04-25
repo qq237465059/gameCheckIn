@@ -1,0 +1,101 @@
+<!-- 我的页面 -->
+<view class="container">
+  <!-- 用户信息头部 -->
+  <view class="user-header">
+    <view class="user-info">
+      <view class="avatar-container" bindtap="uploadAvatar">
+        <image class="avatar" src="{{userInfo.avatarUrl || '/assets/images/default-avatar.png'}}"></image>
+        <view class="edit-avatar">
+          <image class="edit-icon" src="/assets/images/icon-edit.png"></image>
+        </view>
+      </view>
+      <view class="user-details">
+        <block wx:if="{{isLoggedIn}}">
+          <view class="user-name">{{userInfo.nickName || '微信用户'}}</view>
+          <view class="user-id">ID: {{userInfo.userId || ''}}</view>
+        </block>
+        <block wx:else>
+          <view class="login-btn-container">
+            <button class="login-btn" bindtap="login">登录 / 注册</button>
+          </view>
+        </block>
+      </view>
+    </view>
+    <view class="achievement">
+      <view class="achievement-item">
+        <text class="achievement-num">{{statistics.createdCount || 0}}</text>
+        <text class="achievement-label">创建活动</text>
+      </view>
+      <view class="achievement-item">
+        <text class="achievement-num">{{statistics.joinedCount || 0}}</text>
+        <text class="achievement-label">参与活动</text>
+      </view>
+      <view class="achievement-item">
+        <text class="achievement-num">{{statistics.checkInCount || 0}}</text>
+        <text class="achievement-label">活动签到</text>
+      </view>
+    </view>
+  </view>
+  
+  <!-- 我的活动 -->
+  <view class="section-title">我的活动</view>
+  <view class="function-cards">
+    <view class="function-card" bindtap="navigateToMyCreated">
+      <view class="function-icon-container created">
+        <image class="function-icon" src="/assets/images/icon-created.png"></image>
+      </view>
+      <view class="function-info">
+        <view class="function-title">我创建的</view>
+        <view class="function-desc">管理我创建的活动</view>
+      </view>
+      <view class="function-arrow">
+        <image class="arrow-icon" src="/assets/images/icon-arrow.png"></image>
+      </view>
+    </view>
+    
+    <view class="function-card" bindtap="navigateToMyJoined">
+      <view class="function-icon-container joined">
+        <image class="function-icon" src="/assets/images/icon-joined.png"></image>
+      </view>
+      <view class="function-info">
+        <view class="function-title">我参与的</view>
+        <view class="function-desc">查看我参与的活动</view>
+      </view>
+      <view class="function-arrow">
+        <image class="arrow-icon" src="/assets/images/icon-arrow.png"></image>
+      </view>
+    </view>
+  </view>
+  
+  <!-- 更多功能 -->
+  <view class="section-title">更多功能</view>
+  <view class="more-functions">
+    <view class="function-item" bindtap="navigateToSettings">
+      <image class="item-icon" src="/assets/images/icon-settings.png"></image>
+      <text class="item-text">设置</text>
+      <image class="item-arrow" src="/assets/images/icon-arrow.png"></image>
+    </view>
+    
+    <view class="function-item" bindtap="navigateToFeedback">
+      <image class="item-icon" src="/assets/images/icon-feedback.png"></image>
+      <text class="item-text">意见反馈</text>
+      <image class="item-arrow" src="/assets/images/icon-arrow.png"></image>
+    </view>
+    
+    <view class="function-item" bindtap="navigateToAbout">
+      <image class="item-icon" src="/assets/images/icon-about.png"></image>
+      <text class="item-text">关于我们</text>
+      <image class="item-arrow" src="/assets/images/icon-arrow.png"></image>
+    </view>
+  </view>
+  
+  <!-- 版本信息 -->
+  <view class="version-info">
+    <text>当前版本: v1.0.0</text>
+  </view>
+  
+  <!-- 退出登录按钮 -->
+  <view class="logout-container" wx:if="{{isLoggedIn}}">
+    <button class="logout-btn" bindtap="logout">退出登录</button>
+  </view>
+</view> 

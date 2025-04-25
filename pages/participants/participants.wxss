@@ -1,0 +1,150 @@
+/* 参与者列表页面样式 */
+.container {
+  padding: 20rpx;
+  background-color: #f6f6f6;
+  min-height: 100vh;
+}
+
+/* 加载提示 */
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 300rpx;
+}
+
+.loading-spinner {
+  width: 60rpx;
+  height: 60rpx;
+  border: 4rpx solid rgba(59, 127, 243, 0.2);
+  border-top-color: #3b7ff3;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20rpx;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 参与者列表 */
+.participant-list {
+  background-color: #fff;
+  border-radius: 12rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  margin-bottom: 20rpx;
+}
+
+.participant-item {
+  padding: 30rpx;
+  display: flex;
+  align-items: center;
+  border-bottom: 1rpx solid #f0f0f0;
+  position: relative;
+}
+
+.participant-item:last-child {
+  border-bottom: none;
+}
+
+.participant-avatar-container {
+  position: relative;
+  margin-right: 20rpx;
+}
+
+.participant-avatar {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 50%;
+}
+
+.creator-tag {
+  position: absolute;
+  bottom: -5rpx;
+  right: -5rpx;
+  font-size: 20rpx;
+  color: #fff;
+  background-color: #f56c6c;
+  padding: 2rpx 8rpx;
+  border-radius: 10rpx;
+}
+
+.participant-info {
+  flex: 1;
+}
+
+.participant-name-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10rpx;
+}
+
+.participant-name {
+  font-size: 30rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+.check-status {
+  font-size: 24rpx;
+  padding: 4rpx 12rpx;
+  border-radius: 20rpx;
+}
+
+.check-status.checked {
+  background-color: rgba(103, 194, 58, 0.1);
+  color: #67c23a;
+}
+
+.check-status.not-checked {
+  background-color: rgba(244, 67, 54, 0.1);
+  color: #f44336;
+}
+
+.location-info, .check-time {
+  font-size: 24rpx;
+  color: #666;
+  margin-top: 8rpx;
+}
+
+.location-label, .check-time-label {
+  color: #999;
+}
+
+.view-location-icon {
+  margin-left: 20rpx;
+}
+
+.location-icon {
+  width: 40rpx;
+  height: 40rpx;
+}
+
+/* 空数据提示 */
+.empty-tip {
+  text-align: center;
+  padding: 60rpx 0;
+  color: #999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.empty-icon {
+  width: 160rpx;
+  height: 160rpx;
+  margin-bottom: 20rpx;
+}
+
+/* 底部提示 */
+.footer-tip {
+  text-align: center;
+  color: #999;
+  font-size: 24rpx;
+  padding: 30rpx 0;
+} 

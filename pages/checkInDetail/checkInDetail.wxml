@@ -1,0 +1,183 @@
+<!--打卡详情页面-->
+<view class="container">
+  <view wx:if="{{loading}}" class="loading">
+    <view class="loading-spinner"></view>
+    <text>加载中...</text>
+  </view>
+  
+  <block wx:else>
+    <!-- 活动信息 -->
+    <view class="activity-card">
+      <view class="activity-title">{{activity.activityName}}</view>
+      <view class="activity-desc">{{activity.activityDesc}}</view>
+      
+      <view class="info-section">
+        <view class="info-item">
+          <image class="info-icon" src="/images/time.png"></image>
+          <text>活动时间：{{activity.formattedTime}}</text>
+        </view>
+        
+        <view class="info-item" bindtap="viewLocation">
+          <image class="info-icon" src="/images/location.png"></image>
+          <text>活动地点：{{activity.activityLocation}}</text>
+          <image class="arrow-icon" src="/images/arrow.png"></image>
+        </view>
+        
+        <view class="requirement-section">
+          <view class="requirement-title">打卡要求</view>
+          <view class="requirement-list">
+            <view class="requirement-item {{isInRange ? 'success' : 'error'}}">
+              <image class="check-icon" src="{{isInRange ? '/images/check.png' : '/images/cross.png'}}"></image>
+              <text>位置范围：</text>
+              <text>{{isInRange ? '在范围内' : '超出范围'}}</text>
+            </view>
+            
+            <view wx:if="{{activity.needFace}}" class="requirement-item">
+              <image class="check-icon" src="/images/face.png"></image>
+              <text>需要人脸识别</text>
+            </view>
+            
+            <view wx:if="{{activity.needPhoto}}" class="requirement-item">
+              <image class="check-icon" src="/images/camera.png"></image>
+              <text>需要拍照上传</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 参与者统计 -->
+    <view class="stats-card">
+      <view class="stats-header">
+        <view class="stats-title">参与人数</view>
+        <view class="stats-count">{{activity.participants.length}}</view>
+      </view>
+      
+      <view class="stats-progress">
+        <view class="progress-bar">
+          <view 
+            class="progress-inner" 
+            style="width: {{activity.participants.length > 0 ? (checkedInUsers.length / activity.participants.length * 100) : 0}}%">
+          </view>
+        </view>
+        <view class="progress-text">已打卡 {{checkedInUsers.length}}/{{activity.participants.length}}</view>
+      </view>
+    </view>
+    
+    <!-- 已打卡用户列表 -->
+    <view class="user-section" wx:if="{{checkedInUsers.length > 0}}">
+      <view class="section-title">
+        <view class="title-text">已打卡</view>
+        <view class="title-count">{{checkedInUsers.length}}人</view>
+      </view>
+      
+      <view class="user-list">
+        <view 
+          class="user-item" 
+          wx:for="{{checkedInUsers}}" 
+          wx:key="userId">
+          <image 
+            class="user-avatar" 
+            src="{{item.avatarUrl}}" 
+            bindtap="previewAvatar"
+            data-url="{{item.avatarUrl}}">
+          </image>
+          <view class="user-info">
+            <view class="user-name">{{item.nickName}}</view>
+            <view class="check-time">{{item.checkInTime}}</view>
+          </view>
+          <view wx:if="{{item.isCreator}}" class="creator-tag">发起人</view>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 未打卡用户列表 -->
+    <view class="user-section" wx:if="{{notCheckedInUsers.length > 0}}">
+      <view class="section-title">
+        <view class="title-text">未打卡</view>
+        <view class="title-count">{{notCheckedInUsers.length}}人</view>
+      </view>
+      
+      <view class="user-list">
+        <view 
+          class="user-item" 
+          wx:for="{{notCheckedInUsers}}" 
+          wx:key="userId">
+          <image 
+            class="user-avatar" 
+            src="{{item.avatarUrl}}" 
+            bindtap="previewAvatar"
+            data-url="{{item.avatarUrl}}">
+          </image>
+          <view class="user-info">
+            <view class="user-name">{{item.nickName}}</view>
+            <view class="not-check-tip">未打卡</view>
+          </view>
+          <view wx:if="{{item.isCreator}}" class="creator-tag">发起人</view>
+          <view wx:if="{{item.isCurrentUser}}" class="self-tag">我</view>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 底部打卡按钮 -->
+    <view class="bottom-bar" wx:if="{{activity.status === 2 && activity.isParticipant && !activity.currentUserCheckedIn}}">
+      <button class="btn-check-in" bindtap="openCheckInModal">立即打卡</button>
+    </view>
+    
+    <!-- 打卡弹窗 -->
+    <view class="modal" wx:if="{{showCheckInModal}}">
+      <view class="modal-mask" bindtap="closeCheckInModal"></view>
+      <view class="modal-content">
+        <view class="modal-header">
+          <view class="modal-title">打卡</view>
+          <image class="modal-close" src="/images/close.png" bindtap="closeCheckInModal"></image>
+        </view>
+        
+        <view class="modal-body">
+          <view class="check-in-form">
+            <!-- 位置信息 -->
+            <view class="form-item">
+              <view class="form-label">位置状态</view>
+              <view class="location-status {{isInRange ? 'success' : 'error'}}">
+                {{isInRange ? '您在打卡范围内' : '您不在打卡范围内，无法打卡'}}
+              </view>
+            </view>
+            
+            <!-- 拍照上传 -->
+            <view class="form-item" wx:if="{{activity.needPhoto}}">
+              <view class="form-label">拍照上传</view>
+              <view class="photo-container">
+                <image 
+                  wx:if="{{checkInParams.photo}}" 
+                  class="preview-photo" 
+                  src="{{checkInParams.photo}}" 
+                  mode="aspectFill">
+                </image>
+                <view wx:else class="photo-placeholder" bindtap="takePhoto">
+                  <image class="photo-icon" src="/images/camera.png"></image>
+                  <text>点击拍照</text>
+                </view>
+              </view>
+            </view>
+            
+            <!-- 人脸识别 -->
+            <view class="form-item" wx:if="{{activity.needFace}}">
+              <view class="form-label">人脸识别</view>
+              <view 
+                class="face-container {{checkInParams.faceData ? 'verified' : ''}}" 
+                bindtap="faceRecognition">
+                <image class="face-icon" src="/images/face.png"></image>
+                <text>{{checkInParams.faceData ? '已完成人脸识别' : '点击进行人脸识别'}}</text>
+              </view>
+            </view>
+          </view>
+        </view>
+        
+        <view class="modal-footer">
+          <button class="btn-cancel" bindtap="closeCheckInModal">取消</button>
+          <button class="btn-submit" bindtap="submitCheckIn">提交打卡</button>
+        </view>
+      </view>
+    </view>
+  </block>
+</view> 

@@ -1,0 +1,336 @@
+/* 活动列表页面样式 */
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #f6f6f6;
+}
+
+/* 搜索栏 */
+.search-bar {
+  padding: 20rpx;
+  background-color: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.search-input-wrapper {
+  display: flex;
+  align-items: center;
+  background-color: #f5f5f5;
+  border-radius: 32rpx;
+  padding: 12rpx 24rpx;
+}
+
+.search-input {
+  flex: 1;
+  height: 64rpx;
+  line-height: 64rpx;
+  font-size: 28rpx;
+  color: #333;
+  margin-left: 16rpx;
+}
+
+.clear-icon {
+  padding: 10rpx;
+}
+
+/* 筛选栏 */
+.filter-bar {
+  display: flex;
+  background-color: #fff;
+  padding: 0 20rpx;
+  border-bottom: 1rpx solid #eee;
+  position: sticky;
+  top: 104rpx;
+  z-index: 10;
+}
+
+.filter-item {
+  padding: 20rpx 30rpx;
+  font-size: 28rpx;
+  color: #666;
+  position: relative;
+}
+
+.filter-item.active {
+  color: #3b7ff3;
+  font-weight: 500;
+}
+
+.filter-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 48rpx;
+  height: 4rpx;
+  background-color: #3b7ff3;
+  border-radius: 2rpx;
+}
+
+/* 活动列表容器 */
+.activity-list-container {
+  flex: 1;
+  overflow: hidden;
+}
+
+/* 加载提示 */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60rpx 0;
+}
+
+.loading-icon {
+  width: 60rpx;
+  height: 60rpx;
+  border: 4rpx solid rgba(59, 127, 243, 0.2);
+  border-radius: 50%;
+  border-top-color: #3b7ff3;
+  animation: rotate 1s linear infinite;
+  margin-bottom: 20rpx;
+}
+
+.loading-icon.small {
+  width: 36rpx;
+  height: 36rpx;
+  border-width: 3rpx;
+}
+
+.loading-text {
+  font-size: 28rpx;
+  color: #999;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 活动列表 */
+.activity-list {
+  padding: 20rpx;
+}
+
+.activity-card {
+  margin-bottom: 20rpx;
+  background-color: #fff;
+  border-radius: 12rpx;
+  overflow: hidden;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
+  position: relative;
+}
+
+.activity-status {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 1;
+}
+
+.status-tag {
+  padding: 8rpx 16rpx;
+  font-size: 22rpx;
+  color: #fff;
+  border-bottom-left-radius: 12rpx;
+}
+
+.status-tag.reserving {
+  background-color: #3b7ff3;
+}
+
+.status-tag.ongoing {
+  background-color: #67c23a;
+}
+
+.status-tag.finished {
+  background-color: #909399;
+}
+
+.activity-content {
+  padding: 30rpx;
+}
+
+.activity-title {
+  font-size: 32rpx;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 20rpx;
+  line-height: 1.4;
+}
+
+.activity-info {
+  margin-bottom: 20rpx;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  font-size: 26rpx;
+  color: #666;
+  margin-bottom: 10rpx;
+}
+
+.info-item:last-child {
+  margin-bottom: 0;
+}
+
+.icon {
+  width: 32rpx;
+  height: 32rpx;
+  margin-right: 12rpx;
+}
+
+.activity-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1rpx solid #f0f0f0;
+  padding-top: 20rpx;
+}
+
+.participants-info {
+  display: flex;
+  flex-direction: column;
+  font-size: 24rpx;
+  color: #999;
+}
+
+.avatar-group {
+  display: flex;
+  align-items: center;
+  margin-top: 10rpx;
+}
+
+.participant-avatar {
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: 50%;
+  border: 2rpx solid #fff;
+  margin-right: -10rpx;
+}
+
+.more-avatar {
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: 50%;
+  background-color: #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20rpx;
+  color: #999;
+  margin-left: 10rpx;
+}
+
+.activity-action {
+  margin-left: 20rpx;
+}
+
+.action-btn {
+  min-width: 120rpx;
+  height: 64rpx;
+  line-height: 64rpx;
+  border-radius: 32rpx;
+  font-size: 26rpx;
+  padding: 0 30rpx;
+  margin: 0;
+}
+
+.join-btn {
+  background-color: #3b7ff3;
+  color: #fff;
+}
+
+.manage-btn {
+  background-color: #f56c6c;
+  color: #fff;
+}
+
+.details-btn {
+  background-color: #f0f0f0;
+  color: #666;
+}
+
+/* 加载更多和无更多数据 */
+.load-more, .no-more {
+  text-align: center;
+  padding: 20rpx 0;
+  font-size: 24rpx;
+  color: #999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.load-more .loading-icon {
+  margin-right: 10rpx;
+  margin-bottom: 0;
+}
+
+/* 空状态 */
+.empty-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 100rpx 0;
+}
+
+.empty-image {
+  width: 240rpx;
+  height: 240rpx;
+  margin-bottom: 30rpx;
+}
+
+.empty-text {
+  font-size: 32rpx;
+  color: #666;
+  margin-bottom: 16rpx;
+}
+
+.empty-tips {
+  font-size: 28rpx;
+  color: #999;
+  margin-bottom: 40rpx;
+}
+
+.create-btn {
+  background-color: #3b7ff3;
+  color: #fff;
+  border-radius: 40rpx;
+  font-size: 30rpx;
+  padding: 0 60rpx;
+  height: 80rpx;
+  line-height: 80rpx;
+}
+
+/* 悬浮按钮 */
+.float-btn {
+  position: fixed;
+  right: 40rpx;
+  bottom: 60rpx;
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 50%;
+  background-color: #3b7ff3;
+  box-shadow: 0 4rpx 16rpx rgba(59, 127, 243, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.plus-icon {
+  width: 40rpx;
+  height: 40rpx;
+} 

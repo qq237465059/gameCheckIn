@@ -1,0 +1,255 @@
+/* 我的页面样式 */
+.container {
+  padding-bottom: 40rpx;
+  background-color: #f6f6f6;
+  min-height: 100vh;
+}
+
+/* 用户信息头部 */
+.user-header {
+  background-color: #3b7ff3;
+  padding: 40rpx 30rpx 60rpx;
+  color: #fff;
+  border-bottom-left-radius: 24rpx;
+  border-bottom-right-radius: 24rpx;
+  box-shadow: 0 4rpx 16rpx rgba(59, 127, 243, 0.2);
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  margin-bottom: 40rpx;
+}
+
+.avatar-container {
+  position: relative;
+  margin-right: 30rpx;
+}
+
+.avatar {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 50%;
+  border: 4rpx solid rgba(255, 255, 255, 0.6);
+}
+
+.edit-avatar {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 40rpx;
+  height: 40rpx;
+  background-color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2rpx 6rpx rgba(0, 0, 0, 0.2);
+}
+
+.edit-icon {
+  width: 24rpx;
+  height: 24rpx;
+}
+
+.user-details {
+  flex: 1;
+}
+
+.user-name {
+  font-size: 34rpx;
+  font-weight: 500;
+  margin-bottom: 8rpx;
+}
+
+.user-id {
+  font-size: 26rpx;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.login-btn-container {
+  padding: 10rpx 0;
+}
+
+.login-btn {
+  background-color: transparent;
+  color: #fff;
+  border: 2rpx solid #fff;
+  border-radius: 40rpx;
+  font-size: 28rpx;
+  padding: 0 40rpx;
+  height: 64rpx;
+  line-height: 60rpx;
+  margin: 0;
+}
+
+.achievement {
+  display: flex;
+  justify-content: space-around;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 12rpx;
+  padding: 20rpx;
+}
+
+.achievement-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.achievement-num {
+  font-size: 36rpx;
+  font-weight: 500;
+  margin-bottom: 8rpx;
+}
+
+.achievement-label {
+  font-size: 24rpx;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* 部分标题 */
+.section-title {
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #333;
+  margin: 40rpx 30rpx 20rpx;
+  position: relative;
+  padding-left: 16rpx;
+}
+
+.section-title::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 6rpx;
+  width: 6rpx;
+  height: 28rpx;
+  background-color: #3b7ff3;
+  border-radius: 3rpx;
+}
+
+/* 功能卡片 */
+.function-cards {
+  padding: 0 30rpx;
+  margin-bottom: 20rpx;
+}
+
+.function-card {
+  display: flex;
+  align-items: center;
+  background-color: #fff;
+  border-radius: 12rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
+}
+
+.function-icon-container {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 20rpx;
+}
+
+.function-icon-container.created {
+  background-color: rgba(59, 127, 243, 0.1);
+}
+
+.function-icon-container.joined {
+  background-color: rgba(245, 108, 108, 0.1);
+}
+
+.function-icon {
+  width: 40rpx;
+  height: 40rpx;
+}
+
+.function-info {
+  flex: 1;
+}
+
+.function-title {
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 8rpx;
+}
+
+.function-desc {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.function-arrow {
+  margin-left: 16rpx;
+}
+
+.arrow-icon {
+  width: 32rpx;
+  height: 32rpx;
+}
+
+/* 更多功能 */
+.more-functions {
+  margin: 0 30rpx;
+  background-color: #fff;
+  border-radius: 12rpx;
+  overflow: hidden;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
+}
+
+.function-item {
+  display: flex;
+  align-items: center;
+  padding: 30rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.function-item:last-child {
+  border-bottom: none;
+}
+
+.item-icon {
+  width: 40rpx;
+  height: 40rpx;
+  margin-right: 20rpx;
+}
+
+.item-text {
+  flex: 1;
+  font-size: 28rpx;
+  color: #333;
+}
+
+.item-arrow {
+  width: 28rpx;
+  height: 28rpx;
+}
+
+/* 版本信息 */
+.version-info {
+  margin-top: 60rpx;
+  text-align: center;
+  font-size: 24rpx;
+  color: #999;
+}
+
+/* 退出登录按钮 */
+.logout-container {
+  margin: 40rpx 30rpx 0;
+}
+
+.logout-btn {
+  background-color: #fff;
+  color: #f56c6c;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+  height: 88rpx;
+  line-height: 88rpx;
+  text-align: center;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
+} 

@@ -1,0 +1,389 @@
+/* 签到页面样式 */
+.container {
+  padding: 20rpx;
+  background-color: #f6f6f6;
+  min-height: 100vh;
+}
+
+/* 加载中 */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 300rpx;
+}
+
+.loading-icon {
+  width: 60rpx;
+  height: 60rpx;
+  border: 4rpx solid rgba(59, 127, 243, 0.2);
+  border-radius: 50%;
+  border-top-color: #3b7ff3;
+  animation: rotate 1s linear infinite;
+  margin-bottom: 20rpx;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-text {
+  font-size: 28rpx;
+  color: #999;
+}
+
+/* 卡片公共样式 */
+.activity-info-card,
+.check-in-status-card,
+.rules-card {
+  background-color: #fff;
+  border-radius: 12rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
+}
+
+/* 活动信息 */
+.activity-title {
+  font-size: 34rpx;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 20rpx;
+}
+
+.activity-info-item {
+  display: flex;
+  align-items: center;
+  font-size: 28rpx;
+  color: #666;
+  margin-bottom: 16rpx;
+}
+
+.activity-info-item:last-child {
+  margin-bottom: 0;
+}
+
+.icon {
+  width: 32rpx;
+  height: 32rpx;
+  margin-right: 12rpx;
+}
+
+.view-map {
+  margin-left: 16rpx;
+  padding: 6rpx 12rpx;
+  background-color: #f5f5f5;
+  border-radius: 16rpx;
+  display: flex;
+  align-items: center;
+}
+
+.map-icon {
+  width: 24rpx;
+  height: 24rpx;
+}
+
+/* 签到状态 */
+.status-title,
+.rules-title {
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 20rpx;
+  display: flex;
+  align-items: center;
+}
+
+.status-title::before,
+.rules-title::before {
+  content: '';
+  width: 6rpx;
+  height: 24rpx;
+  background-color: #3b7ff3;
+  margin-right: 12rpx;
+  border-radius: 3rpx;
+}
+
+/* 已签到状态 */
+.checked-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40rpx 0;
+}
+
+.checked-icon {
+  width: 120rpx;
+  height: 120rpx;
+  margin-bottom: 20rpx;
+}
+
+.checked-text {
+  font-size: 34rpx;
+  font-weight: 500;
+  color: #67c23a;
+  margin-bottom: 16rpx;
+}
+
+.check-in-time,
+.check-in-desc {
+  font-size: 26rpx;
+  color: #999;
+  margin-bottom: 8rpx;
+}
+
+/* 未签到表单 */
+.check-in-form {
+  padding: 20rpx 0;
+}
+
+.location-info {
+  background-color: #f5f8ff;
+  padding: 20rpx;
+  border-radius: 10rpx;
+  margin-bottom: 30rpx;
+}
+
+.location-title {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 12rpx;
+}
+
+.location-content {
+  margin-bottom: 16rpx;
+}
+
+.location-name {
+  font-size: 26rpx;
+  color: #666;
+  margin-bottom: 8rpx;
+}
+
+.location-loading {
+  color: #999;
+}
+
+.distance-info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 26rpx;
+  color: #666;
+}
+
+.range-status {
+  font-weight: 500;
+}
+
+.in-range {
+  color: #67c23a;
+}
+
+.out-of-range {
+  color: #f56c6c;
+}
+
+.refresh-btn {
+  font-size: 26rpx;
+  color: #3b7ff3;
+  background-color: #fff;
+  border: 1rpx solid #3b7ff3;
+  border-radius: 30rpx;
+  height: 60rpx;
+  line-height: 58rpx;
+  margin: 0;
+  width: 160rpx;
+}
+
+/* 签到要求 */
+.check-in-requirements {
+  display: flex;
+  margin-bottom: 30rpx;
+}
+
+.requirement-item {
+  display: flex;
+  align-items: center;
+  font-size: 26rpx;
+  color: #666;
+  margin-right: 30rpx;
+}
+
+.requirement-icon {
+  width: 32rpx;
+  height: 32rpx;
+  margin-right: 8rpx;
+}
+
+/* 人脸识别 */
+.face-verify-section,
+.face-verified {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 30rpx;
+}
+
+.verify-btn {
+  background-color: #3b7ff3;
+  color: #fff;
+  font-size: 28rpx;
+  border-radius: 40rpx;
+  padding: 0 60rpx;
+  height: 80rpx;
+  line-height: 80rpx;
+  margin-bottom: 16rpx;
+}
+
+.verify-tips,
+.photo-tips {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.verified-icon {
+  width: 64rpx;
+  height: 64rpx;
+  margin-bottom: 12rpx;
+}
+
+.verified-text {
+  font-size: 28rpx;
+  color: #67c23a;
+  font-weight: 500;
+}
+
+/* 上传照片 */
+.upload-photo-section {
+  margin-bottom: 30rpx;
+}
+
+.photo-title {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 16rpx;
+}
+
+.photo-content {
+  margin-bottom: 12rpx;
+}
+
+.photo-item,
+.photo-upload-btn {
+  width: 200rpx;
+  height: 200rpx;
+  border-radius: 8rpx;
+  overflow: hidden;
+  position: relative;
+}
+
+.photo-image {
+  width: 100%;
+  height: 100%;
+}
+
+.photo-delete {
+  position: absolute;
+  top: 8rpx;
+  right: 8rpx;
+  width: 40rpx;
+  height: 40rpx;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.delete-icon {
+  width: 24rpx;
+  height: 24rpx;
+}
+
+.photo-upload-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #f5f5f5;
+  border: 1rpx dashed #ddd;
+  font-size: 24rpx;
+  color: #999;
+}
+
+.upload-icon {
+  width: 48rpx;
+  height: 48rpx;
+  margin-bottom: 12rpx;
+}
+
+/* 签到按钮 */
+.check-in-btn {
+  background-color: #3b7ff3;
+  color: #fff;
+  font-size: 30rpx;
+  border-radius: 40rpx;
+  height: 88rpx;
+  line-height: 88rpx;
+  margin-top: 20rpx;
+  width: 100%;
+}
+
+.check-in-btn.disabled {
+  background-color: #ccc;
+  color: #fff;
+}
+
+/* 签到规则 */
+.rules-content {
+  font-size: 26rpx;
+  color: #666;
+  line-height: 1.6;
+}
+
+.rule-item {
+  margin-bottom: 10rpx;
+}
+
+.rule-item:last-child {
+  margin-bottom: 0;
+}
+
+/* 错误提示 */
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 500rpx;
+}
+
+.error-image {
+  width: 160rpx;
+  height: 160rpx;
+  margin-bottom: 20rpx;
+}
+
+.error-text {
+  font-size: 28rpx;
+  color: #666;
+  margin-bottom: 30rpx;
+}
+
+.retry-btn {
+  background-color: #3b7ff3;
+  color: #fff;
+  font-size: 28rpx;
+  border-radius: 40rpx;
+  padding: 0 60rpx;
+  height: 80rpx;
+  line-height: 80rpx;
+} 

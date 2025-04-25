@@ -1,0 +1,200 @@
+<!--活动详情页面-->
+<view class="container">
+  <!-- 加载中 -->
+  <view class="loading-container" wx:if="{{loading}}">
+    <view class="loading-spinner"></view>
+    <view class="loading-text">加载中...</view>
+  </view>
+
+  <!-- 页面内容 -->
+  <block wx:elif="{{activity}}">
+    <!-- 创建/编辑模式 -->
+    <block wx:if="{{type === 'create' || isEdit}}">
+      <view class="form-card">
+        <view class="form-title">{{ type === 'create' ? '创建活动' : '编辑活动' }}</view>
+        
+        <view class="form-group">
+          <view class="form-label">活动名称 <text class="required">*</text></view>
+          <input class="form-control" placeholder="请输入活动名称" value="{{activity.activityName}}" 
+            bindinput="inputChange" data-field="activityName" disabled="{{readonly}}" />
+        </view>
+        
+        <view class="form-group">
+          <view class="form-label">活动描述</view>
+          <textarea class="form-textarea" placeholder="请输入活动描述" value="{{activity.activityDesc}}" 
+            bindinput="inputChange" data-field="activityDesc" disabled="{{readonly}}"></textarea>
+        </view>
+        
+        <view class="form-group">
+          <view class="form-label">活动时间 <text class="required">*</text></view>
+          <view class="time-picker" bindtap="chooseActivityTime">
+            <text>{{activity.formattedTime || '请选择时间'}}</text>
+            <text class="icon-time" wx:if="{{!readonly}}">⏱️</text>
+          </view>
+        </view>
+        
+        <view class="form-group">
+          <view class="form-label">活动地点 <text class="required">*</text></view>
+          <view class="location-picker" bindtap="chooseLocation">
+            <text>{{activity.activityLocation || '请选择地点'}}</text>
+            <text class="icon-location" wx:if="{{!readonly}}">📍</text>
+          </view>
+        </view>
+        
+        <view class="form-group">
+          <view class="form-label">预约时间</view>
+          <view class="time-range">
+            <view class="time-picker" bindtap="chooseReserveTime" data-type="start">
+              <text>{{activity.reserveTimeStart ? (activity.formattedReserveTime ? activity.formattedReserveTime.split(' - ')[0] : '请选择时间') : '请选择时间'}}</text>
+              <text class="icon-time" wx:if="{{!readonly}}">⏱️</text>
+            </view>
+            <view class="time-separator">至</view>
+            <view class="time-picker" bindtap="chooseReserveTime" data-type="end">
+              <text>{{activity.reserveTimeEnd ? (activity.formattedReserveTime ? activity.formattedReserveTime.split(' - ')[1] : '请选择时间') : '请选择时间'}}</text>
+              <text class="icon-time" wx:if="{{!readonly}}">⏱️</text>
+            </view>
+          </view>
+        </view>
+        
+        <view class="form-group">
+          <view class="form-label">签到要求</view>
+          <view class="checkbox-group">
+            <view class="checkbox-item" bindtap="toggleNeedFace">
+              <view class="checkbox {{activity.needFace ? 'checked' : ''}}"></view>
+              <view class="checkbox-label">人脸识别</view>
+            </view>
+            <view class="checkbox-item" bindtap="toggleNeedPhoto">
+              <view class="checkbox {{activity.needPhoto ? 'checked' : ''}}"></view>
+              <view class="checkbox-label">照片签到</view>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <view class="bottom-bar">
+        <button class="btn-cancel" bindtap="cancelEdit" wx:if="{{!type}}">取消</button>
+        <button class="btn-save" bindtap="saveActivity">{{ type === 'create' ? '创建活动' : '保存修改' }}</button>
+      </view>
+    </block>
+
+    <!-- 查看模式 -->
+    <block wx:else>
+      <view class="activity-card">
+        <view class="activity-title">{{activity.activityName}}</view>
+        <view class="activity-desc">{{activity.activityDesc}}</view>
+        
+        <view class="info-section">
+          <view class="info-item">
+            <view class="info-icon">🕒</view>
+            <view class="info-content">
+              <view class="info-label">活动时间</view>
+              <view class="info-value">{{activity.formattedTime}}</view>
+            </view>
+          </view>
+          
+          <view class="info-item">
+            <view class="info-icon">📍</view>
+            <view class="info-content">
+              <view class="info-label">活动地点</view>
+              <view class="info-value">{{activity.activityLocation}}</view>
+            </view>
+          </view>
+          
+          <view class="info-item" wx:if="{{activity.formattedReserveTime}}">
+            <view class="info-icon">📅</view>
+            <view class="info-content">
+              <view class="info-label">预约时间</view>
+              <view class="info-value">{{activity.formattedReserveTime}}</view>
+            </view>
+          </view>
+          
+          <view class="info-item">
+            <view class="info-icon">📝</view>
+            <view class="info-content">
+              <view class="info-label">签到要求</view>
+              <view class="info-value">
+                <text wx:if="{{activity.needFace}}">人脸识别</text>
+                <text wx:if="{{activity.needFace && activity.needPhoto}}"> | </text>
+                <text wx:if="{{activity.needPhoto}}">照片签到</text>
+                <text wx:if="{{!activity.needFace && !activity.needPhoto}}">无特殊要求</text>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+      
+      <!-- 参与者列表 -->
+      <view class="participant-card">
+        <view class="section-title">
+          参与者 <text class="participant-count">({{participants.length}})</text>
+          <view class="view-all" bindtap="viewAllParticipants" wx:if="{{participants.length > 0}}">查看全部</view>
+        </view>
+        <view class="participant-list">
+          <block wx:if="{{participants.length > 0}}">
+            <view class="participant-item" wx:for="{{participants}}" wx:key="id" wx:if="{{index < 10}}">
+              <image class="participant-avatar" src="{{item.avatar}}" mode="aspectFill" bindtap="previewAvatar" data-url="{{item.avatar}}"></image>
+              <view class="participant-name">{{item.name}}</view>
+              <view class="participant-tag" wx:if="{{item.isCreator}}">创建者</view>
+            </view>
+          </block>
+          <view class="no-data" wx:else>
+            暂无参与者
+          </view>
+        </view>
+      </view>
+      
+      <!-- 底部操作栏 -->
+      <view class="bottom-bar">
+        <block wx:if="{{activity.creatorId === app.globalData.userInfo.id}}">
+          <button class="btn-edit" bindtap="editActivity" wx:if="{{!readonly}}">编辑活动</button>
+        </block>
+        <block wx:else>
+          <button class="btn-join {{isParticipant ? 'btn-disabled' : ''}}" bindtap="openJoinModal" disabled="{{isParticipant}}">
+            {{isParticipant ? '已加入' : '加入活动'}}
+          </button>
+        </block>
+        <button class="btn-share" open-type="share">分享活动</button>
+      </view>
+    </block>
+  </block>
+  
+  <block wx:else>
+    <view class="error-container">
+      <view class="error-icon">❌</view>
+      <view class="error-text">活动加载失败，请重试</view>
+    </view>
+  </block>
+  
+  <!-- 加入活动弹窗 -->
+  <view class="modal-mask" wx:if="{{showJoinModal}}" bindtap="closeJoinModal"></view>
+  <view class="modal" wx:if="{{showJoinModal}}">
+    <view class="modal-header">
+      <view class="modal-title">加入活动</view>
+      <view class="modal-close" bindtap="closeJoinModal">×</view>
+    </view>
+    
+    <view class="modal-body">
+      <view class="form-group">
+        <view class="form-label">签到位置 <text class="required">*</text></view>
+        <view class="location-picker" bindtap="chooseCheckInLocation">
+          <text>{{joinParams.checkInLocation ? (joinParams.checkInLocation.name || joinParams.checkInLocation.address) : '请选择签到位置'}}</text>
+          <text class="icon-location">📍</text>
+        </view>
+        <view class="form-hint">签到时需要在此位置附近才能成功签到</view>
+      </view>
+      
+      <view class="form-group">
+        <view class="form-label">签到范围</view>
+        <view class="range-slider">
+          <slider min="50" max="2000" step="50" value="{{joinParams.checkInRange}}" show-value bindchange="changeCheckInRange" activeColor="#3b7ff3" />
+          <view class="range-display">{{joinParams.checkInRange}}米</view>
+        </view>
+      </view>
+    </view>
+    
+    <view class="modal-footer">
+      <button class="btn-cancel" bindtap="closeJoinModal">取消</button>
+      <button class="btn-confirm" bindtap="joinActivity">确认加入</button>
+    </view>
+  </view>
+</view> 

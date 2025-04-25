@@ -1,0 +1,179 @@
+/**app.wxss**/
+page {
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', Arial, sans-serif;
+  font-size: 28rpx;
+  line-height: 1.5;
+  color: #333;
+  background-color: #f6f6f6;
+  box-sizing: border-box;
+}
+
+/* 清除浮动 */
+.clearfix:after {
+  content: "";
+  display: block;
+  clear: both;
+}
+
+/* 常用颜色 */
+.primary-color {
+  color: #3a86ff;
+}
+
+.success-color {
+  color: #4caf50;
+}
+
+.warning-color {
+  color: #ff9800;
+}
+
+.danger-color {
+  color: #f44336;
+}
+
+/* 常用按钮样式 */
+.btn {
+  display: inline-block;
+  padding: 20rpx 30rpx;
+  border-radius: 8rpx;
+  text-align: center;
+  font-size: 30rpx;
+  line-height: 1;
+  box-sizing: border-box;
+}
+
+.btn-primary {
+  background-color: #3a86ff;
+  color: #fff;
+}
+
+.btn-success {
+  background-color: #4caf50;
+  color: #fff;
+}
+
+.btn-warning {
+  background-color: #ff9800;
+  color: #fff;
+}
+
+.btn-danger {
+  background-color: #f44336;
+  color: #fff;
+}
+
+/* 块级按钮 */
+.btn-block {
+  display: block;
+  width: 100%;
+}
+
+/* 卡片样式 */
+.card {
+  background-color: #fff;
+  border-radius: 10rpx;
+  padding: 20rpx;
+  margin: 20rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.1);
+}
+
+/* 列表项样式 */
+.list-item {
+  padding: 20rpx;
+  background-color: #fff;
+  border-bottom: 1rpx solid #eee;
+}
+
+.list-item:last-child {
+  border-bottom: none;
+}
+
+/* 头像样式 */
+.avatar {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+}
+
+/* 标签样式 */
+.tag {
+  display: inline-block;
+  padding: 4rpx 12rpx;
+  font-size: 24rpx;
+  border-radius: 4rpx;
+  margin-right: 10rpx;
+}
+
+.tag-primary {
+  background-color: rgba(58, 134, 255, 0.1);
+  color: #3a86ff;
+}
+
+.tag-success {
+  background-color: rgba(76, 175, 80, 0.1);
+  color: #4caf50;
+}
+
+.tag-warning {
+  background-color: rgba(255, 152, 0, 0.1);
+  color: #ff9800;
+}
+
+.tag-danger {
+  background-color: rgba(244, 67, 54, 0.1);
+  color: #f44336;
+}
+
+/* 表单样式 */
+.form-group {
+  margin-bottom: 20rpx;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 10rpx;
+  font-weight: bold;
+}
+
+.form-control {
+  width: 100%;
+  height: 80rpx;
+  padding: 0 20rpx;
+  border: 1rpx solid #ddd;
+  border-radius: 8rpx;
+  box-sizing: border-box;
+}
+
+/* 间距工具类 */
+.mt-10 {
+  margin-top: 10rpx;
+}
+
+.mt-20 {
+  margin-top: 20rpx;
+}
+
+.mb-10 {
+  margin-bottom: 10rpx;
+}
+
+.mb-20 {
+  margin-bottom: 20rpx;
+}
+
+.ml-10 {
+  margin-left: 10rpx;
+}
+
+.mr-10 {
+  margin-right: 10rpx;
+}
+
+.p-10 {
+  padding: 10rpx;
+}
+
+.p-20 {
+  padding: 20rpx;
+} 

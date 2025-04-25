@@ -1,0 +1,118 @@
+<!--活动列表页面-->
+<view class="container">
+  <!-- 搜索栏 -->
+  <view class="search-bar">
+    <view class="search-input-wrapper">
+      <icon type="search" size="14" color="#999"></icon>
+      <input 
+        class="search-input" 
+        placeholder="搜索活动名称" 
+        confirm-type="search"
+        value="{{keyword}}"
+        bindinput="onKeywordInput"
+        bindconfirm="searchActivities"
+      />
+      <view class="clear-icon" wx:if="{{keyword}}" bindtap="clearKeyword">
+        <icon type="clear" size="14" color="#999"></icon>
+      </view>
+    </view>
+  </view>
+
+  <!-- 分类筛选 -->
+  <view class="filter-bar">
+    <view class="filter-item {{statusFilter === 'all' ? 'active' : ''}}" data-status="all" bindtap="setStatusFilter">全部</view>
+    <view class="filter-item {{statusFilter === 'reserving' ? 'active' : ''}}" data-status="reserving" bindtap="setStatusFilter">预约中</view>
+    <view class="filter-item {{statusFilter === 'ongoing' ? 'active' : ''}}" data-status="ongoing" bindtap="setStatusFilter">进行中</view>
+    <view class="filter-item {{statusFilter === 'finished' ? 'active' : ''}}" data-status="finished" bindtap="setStatusFilter">已结束</view>
+  </view>
+
+  <!-- 列表内容 -->
+  <scroll-view 
+    scroll-y 
+    class="activity-list-container"
+    bindscrolltolower="loadMoreActivities"
+    refresher-enabled="{{true}}"
+    refresher-triggered="{{refreshing}}"
+    bindrefresherrefresh="onRefresh"
+  >
+    <!-- 加载中 -->
+    <view class="loading-container" wx:if="{{loading && !refreshing && activities.length === 0}}">
+      <view class="loading-icon"></view>
+      <text class="loading-text">加载中...</text>
+    </view>
+
+    <!-- 活动列表 -->
+    <view class="activity-list" wx:elif="{{activities.length > 0}}">
+      <view 
+        class="activity-card" 
+        wx:for="{{activities}}" 
+        wx:key="id"
+        bindtap="navigateToDetail"
+        data-id="{{item.id}}"
+      >
+        <view class="activity-status">
+          <text class="status-tag {{item.statusClass}}">{{item.statusText}}</text>
+        </view>
+        <view class="activity-content">
+          <view class="activity-title">{{item.activityName}}</view>
+          <view class="activity-info">
+            <view class="info-item">
+              <image class="icon" src="/assets/images/icon-time.png"></image>
+              <text>{{item.formattedTime}}</text>
+            </view>
+            <view class="info-item">
+              <image class="icon" src="/assets/images/icon-location.png"></image>
+              <text>{{item.activityLocation}}</text>
+            </view>
+          </view>
+          <view class="activity-footer">
+            <view class="participants-info">
+              <text>{{item.participantCount}}人参与</text>
+              <view class="avatar-group">
+                <image 
+                  class="participant-avatar" 
+                  wx:for="{{item.participantAvatars}}" 
+                  wx:key="index" 
+                  wx:for-item="avatar"
+                  src="{{avatar || '/assets/images/default-avatar.png'}}"
+                ></image>
+                <view class="more-avatar" wx:if="{{item.participantCount > 3}}">+{{item.participantCount - 3}}</view>
+              </view>
+            </view>
+            <view class="activity-action">
+              <button 
+                class="action-btn {{item.isCreator ? 'manage-btn' : (item.canJoin ? 'join-btn' : 'details-btn')}}"
+                data-id="{{item.id}}"
+                catchtap="{{item.isCreator ? 'manageActivity' : (item.canJoin ? 'joinActivity' : 'viewActivityDetail')}}"
+              >
+                {{item.isCreator ? '管理' : (item.canJoin ? '参与' : '查看')}}
+              </button>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 加载更多 -->
+      <view class="load-more" wx:if="{{hasMore}}">
+        <view class="loading-icon small"></view>
+        <text>加载更多...</text>
+      </view>
+      <view class="no-more" wx:else>
+        <text>没有更多活动了</text>
+      </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view class="empty-container" wx:elif="{{!loading}}">
+      <image class="empty-image" src="/assets/images/empty-activities.png"></image>
+      <text class="empty-text">暂无活动</text>
+      <text class="empty-tips">快去创建一个活动吧</text>
+      <button class="create-btn" bindtap="createActivity">创建活动</button>
+    </view>
+  </scroll-view>
+
+  <!-- 悬浮按钮：创建活动 -->
+  <view class="float-btn" bindtap="createActivity" wx:if="{{activities.length > 0}}">
+    <image class="plus-icon" src="/assets/images/icon-plus.png"></image>
+  </view>
+</view> 

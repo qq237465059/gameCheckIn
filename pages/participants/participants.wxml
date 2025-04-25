@@ -1,0 +1,48 @@
+<!--参与者列表页面-->
+<view class="container">
+  <!-- 加载状态 -->
+  <view class="loading-container" wx:if="{{loading}}">
+    <view class="loading"></view>
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <!-- 参与者列表 -->
+  <block wx:elif="{{participants && participants.length > 0}}">
+    <view class="header">
+      <text class="title">共{{participants.length}}人</text>
+      <view class="filter-container">
+        <text class="filter {{filter === 'all' ? 'active' : ''}}" bindtap="setFilter" data-filter="all">全部</text>
+        <text class="filter {{filter === 'checked' ? 'active' : ''}}" bindtap="setFilter" data-filter="checked">已签到</text>
+        <text class="filter {{filter === 'notChecked' ? 'active' : ''}}" bindtap="setFilter" data-filter="notChecked">未签到</text>
+      </view>
+    </view>
+
+    <view class="participants-list">
+      <view class="participant-item" wx:for="{{filteredParticipants}}" wx:key="userId">
+        <view class="participant-avatar" bindtap="previewAvatar" data-url="{{item.avatarUrl}}">
+          <image class="avatar" src="{{item.avatarUrl || '/assets/images/default-avatar.png'}}"></image>
+        </view>
+        <view class="participant-info">
+          <view class="participant-name">{{item.nickName || '微信用户'}}</view>
+          <view class="participant-time">参与时间：{{item.joinTime}}</view>
+        </view>
+        <view class="participant-status">
+          <view wx:if="{{item.checkInStatus}}" class="status checked">已签到</view>
+          <view wx:else class="status not-checked">未签到</view>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <!-- 暂无数据 -->
+  <view class="empty-container" wx:else>
+    <image class="empty-image" src="/assets/images/empty.png"></image>
+    <view class="empty-text">暂无参与者</view>
+    <view class="empty-tips">创建活动并分享给好友</view>
+  </view>
+
+  <!-- 页脚提示 -->
+  <view class="footer-tips" wx:if="{{participants && participants.length > 0}}">
+    <text>下拉可刷新参与者列表</text>
+  </view>
+</view> 
